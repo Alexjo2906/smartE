@@ -8,8 +8,8 @@
 
 ////////////////////   Declare pins    ////////////////////
 
-// int lmtPos = ;
-// int lmtAli = ;
+// int lmtPos = 4;
+int lmtAli = 4;
 int servPos = 9;
 int servAli = 10;
 
@@ -32,7 +32,7 @@ int rstServPos();
 int rstServAli();
 
 int movServPos(int posServPos);
-int movServAli(int pos);
+int movServAli(int posServAli);
 
 void printState();
 
@@ -52,11 +52,44 @@ void setup() {
 //////////////////////////////    LOOP   /////////////////////////////////////////////
 
 void loop() {
-  serialCom();
-  ardMenu(int inState);
+  // serialCom();
+ // ardMenu(int inState);
+  Serial.println("Started process..");
+  rstServPos();
+  movServAli(posServPos);
 }
 
 ////////////////////////////    Functions   ///////////////////////////////////////////
+
+int rstServPos(){
+  int lmtPos = 0;
+  do{
+    for (int pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+      // Serial.println("Waiting for Limit Switch...");
+      lmtPos = digitalRead(4);
+      myServo.write(servAli);              // tell servo to go to position in variable 'pos'
+      delay(15);                       // waits 15ms for the servo to reach the position
+    }
+    Serial.println("Waiting for Limit Switch...");
+    Serial.println(lmtPos);
+  }
+  while (lmtPos = 0);
+  return (posServAli = 0);
+}
+
+int movServAli(int maxPos){
+    for (int pos = 0; pos <= maxPos; pos += 1) { // goes from 0 degrees to 180 degrees
+      // in steps of 1 degree
+      myServo.write(servAli);              // tell servo to go to position in variable 'pos'
+      delay(15);                       // waits 15ms for the servo to reach the position
+    }
+    for (int pos = maxPos; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+      myServo.write(servAli);              // tell servo to go to position in variable 'pos'
+      delay(15);                       // waits 15ms for the servo to reach the position
+    }
+    // Serial.println(1);  //Sending the data over serial to Raspberry pi
+    Serial.println("Moving Servo...");
+}
 
 int serialCom(){
   if (Serial.available() > 0){  //Looking for incoming data
@@ -66,14 +99,18 @@ int serialCom(){
 }
 
 int ardMenu(int inState){
-  switch (instate)
+  switch (inState)
   {
     case 0:
       /* code */
       break;
     case 1:
-      rstServPos();
-      movServPos(posServPos);
+      int posServPos = rstServPos();
+      if (posServPos = 0) {
+        int maxPos = 90;
+        movServPos(maxPos);
+      
+      }
       break;
     default:
       Serial.print("Incoming state is false");
@@ -82,41 +119,18 @@ int ardMenu(int inState){
   return 0;
 }
 
-int movServPos(int pos){
-  for (int pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
-      // in steps of 1 degree
-      myServo.write(pos);              // tell servo to go to position in variable 'pos'
-      delay(15);                       // waits 15ms for the servo to reach the position
-    }
-    for (int pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
-      myServo.write(pos);              // tell servo to go to position in variable 'pos'
-      delay(15);                       // waits 15ms for the servo to reach the position
-    }
-    Serial.println(1);  //Sending the data over serial to Raspberry pi
-}
-
 /*
-int movServAli(){
-  for (int pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+int movServPos(int maxPos){
+  
+  for (int pos = 0; pos <= maxPos; pos += 1) { // goes from 0 degrees to 180 degrees
       // in steps of 1 degree
-      myServo.write(pos);              // tell servo to go to position in variable 'pos'
+      myServo.write(servPos);              // tell servo to go to position in variable 'pos'
       delay(15);                       // waits 15ms for the servo to reach the position
     }
-    for (int pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
-      myServo.write(pos);              // tell servo to go to position in variable 'pos'
+    for (int pos = maxPos; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
+      myServo.write(servPos);              // tell servo to go to position in variable 'pos'
       delay(15);                       // waits 15ms for the servo to reach the position
     }
     Serial.println(1);  //Sending the data over serial to Raspberry pi
 }
 */
-
-rstServPos(){
-  do{
-    for (int pos = 180; pos >= 0; pos -= 1) { // goes from 180 degrees to 0 degrees
-      myServo.write(pos);              // tell servo to go to position in variable 'pos'
-      delay(15);                       // waits 15ms for the servo to reach the position
-    }
-  }
-  while (lmtPos = LOW);
-  return (posServAli = 0);
-}
